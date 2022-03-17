@@ -20,4 +20,4 @@ pretty = Pretty(f"Hello {name}")
 panel = Panel(pretty, title="Welcome 🎉", subtitle="Thank you!")
 con.print(panel, style="bold green")
 
-con.print("All Done", style="green on white")
+con.print("Would you like to play a game?", style="red")
