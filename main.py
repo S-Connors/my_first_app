@@ -53,29 +53,29 @@ garden.items.append(leaves)
 garden.items.append(rock)
 
 #create room - kitchen
-kitchen =Room('Kitchen','You are in a large kitchen. A chef preparing dinner. Beside him are bones and an apple. To the east you see another door. To the south is the garden.')
+kitchen =Room('Kitchen','You are in a large kitchen. A chef preparing dinner. Beside him are bones and an apple. To the east you see another door.')
 kitchen.items.append(chef)
 kitchen.items.append(bones)
 kitchen.items.append(apple)
 
 #create room - living Room
-living_room = Room('Living Room','You are in a living room. There are locked glass windows to the east. A large dog is sleeping by a door to the north. To the west is the kitchen.')
+living_room = Room('Living Room','You are in a living room. There are locked glass windows to the east. A large dog is sleeping by a door to the north.')
 living_room.items.append(dog)
 living_room.items.append(scrap_paper)
 living_room.items.append(book)
 
 #create room - front yard
-front_yard = Room('Front Yard', 'You are in the front yard. A large gate with an electric lock blocks the street. Beside the gate is a tree. To the south is the living room.')
+front_yard = Room('Front Yard', 'You are in the front yard. A large gate lock blocks your escape to the street.')
 front_yard.items.append(tree)
 front_yard.items.append(electric_lock)
 
 #create exits
-garden.exits['n'] = kitchen
-kitchen.exits['s'] = garden
-kitchen.exits['e'] = living_room
-living_room.exits['n'] = front_yard
-living_room.exits['w'] = kitchen
-front_yard.exits['s'] = living_room
+garden.exits['north'] = kitchen
+kitchen.exits['south'] = garden
+kitchen.exits['east'] = living_room
+living_room.exits['north'] = front_yard
+living_room.exits['west'] = kitchen
+front_yard.exits['south'] = living_room
 
 # Get the name of your user
 name = Prompt.ask(
@@ -92,11 +92,69 @@ else:
     print("Let's see if you can escape!")
 
 #make  instructions
-instructions = ("""You can move in 4 directions: n, s, e, w
-You can interact with items: get, drop, examine, climb""")
+instructions = ("""You can move in 4 directions: north, south, east, west
+You can interact with items: get, drop, examine, climb
+You can check your inventory: inv""")
 
 panel = Panel(instructions, title="Instructions")
 con.print(panel, style="bold green")
 
 #create player
 player = Player(name, garden)
+
+
+    #print info
+while True:
+    print('')
+    print(player.location.name)
+    print(player.location.discription)
+    print('Here are the exits:')
+    for exit in player.location.exits:
+        print(exit)
+    print('Here are the items around you:')
+    for item in player.location.items:
+        print(item.name)
+
+    #get command
+    command = input("""What would you like to do?
+    >""")
+
+    words = command.split()
+    if len(words) > 0:
+        verb = words[0]
+    if len(words) >1:
+        noun = words[1]
+
+    #examine
+    if verb == 'examine':
+        for item in player.location.items:
+            if item.name == noun:
+                print(item.description)
+        for item in player.inventory.items:
+            if item.name == noun:
+                print(item.description)
+
+    #get
+    if verb == 'get':
+        for item in player.location.items:
+            if item.name == noun:
+                if item.is_movable:
+                    print(f"{item.name} is added to your inventory")
+                else:
+                    print("Sorry, you can't move that")
+
+    #climb
+    if verb == 'climb':
+        for item in player.location.items:
+            if item.name == 'tree':
+                if apple in player.inventory:
+                    print("A bird flew out of the tree and attacked you. You gave him your apple and ran away.")
+                    inventory = player.inventory.remove(apple)
+                else:
+                    print("You tried climbing the tree. Unfortunatly you fell out and broke your ankle. Game over. ")
+                    exit()
+            if item.name == 'gate':
+                print("You tried climbing the gate, but you fell down and broke your ankle. Game over.")
+                exit()
+            else:
+                print("You can not climb this")
