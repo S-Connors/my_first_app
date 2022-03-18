@@ -25,7 +25,8 @@ class Item():
     def __init__(self, name, description, is_movable):
         self.name = name
         self.description = description
-        is_movable = is_movable
+        self.is_movable = is_movable
+        self.inventory = []
 
 #create garden items
 sunflower = Item("sunflower", "Beautiful yellow sunflower in bloom", True)
@@ -39,12 +40,13 @@ apple = Item('apple', 'Red apple', True)
 
 #create living room items
 dog = Item('dog', 'Large black dog. He is sleeping but could wake up any moment. I do not think he would like you being there', False)
-scrap_paper = Item('scrap of paper', 'A handwritten note with the numbers 487932', True)
+paper = Item('paper', 'A handwritten note with the numbers 487932', True)
 book = Item('book','Looks like a book with a highlighted passage. Ninty seven animals animals live in the surrounding area. Only fourty three are harmless, the remaining fifty four are dangerous.', True)
 
 #create front yard items
 tree = Item('tree','An old oak tree overlooks the gate. It looks easy to climb', False)
-electric_lock = Item('electric lock','A lock to the gate with numbers 0-9. A password is required.', False)
+lock = Item('lock','A lock to the gate with numbers 0-9. A password is required.', False)
+gate = Item('gate',"A large impenetrable gate.",False)
 
 #create room - garden
 garden = Room('Garden', 'You are in a large garden with high cedar fencing. In the flower bed you see sunflowers, leaves and rocks. To the north is an open door to a house.')
@@ -61,13 +63,14 @@ kitchen.items.append(apple)
 #create room - living Room
 living_room = Room('Living Room','You are in a living room. There are locked glass windows to the east. A large dog is sleeping by a door to the north.')
 living_room.items.append(dog)
-living_room.items.append(scrap_paper)
+living_room.items.append(paper)
 living_room.items.append(book)
 
 #create room - front yard
 front_yard = Room('Front Yard', 'You are in the front yard. A large gate lock blocks your escape to the street.')
 front_yard.items.append(tree)
-front_yard.items.append(electric_lock)
+front_yard.items.append(lock)
+front_yard.items.append(gate)
 
 #create exits
 garden.exits['north'] = kitchen
@@ -93,7 +96,7 @@ else:
 
 #make  instructions
 instructions = ("""You can move in 4 directions: north, south, east, west
-You can interact with items: get, drop, examine, climb
+You can interact: get, drop, examine, climb, give
 You can check your inventory: inv""")
 
 panel = Panel(instructions, title="Instructions")
@@ -102,8 +105,7 @@ con.print(panel, style="bold green")
 #create player
 player = Player(name, garden)
 
-
-    #print info
+#print info
 while True:
     print('')
     print(player.location.name)
@@ -111,7 +113,8 @@ while True:
     print('Here are the exits:')
     for exit in player.location.exits:
         print(exit)
-    print('Here are the items around you:')
+
+    print('Here are the things around you:')
     for item in player.location.items:
         print(item.name)
 
@@ -124,13 +127,23 @@ while True:
         verb = words[0]
     if len(words) >1:
         noun = words[1]
+    if len(words) >2:
+        w_three = words[2]
 
     #examine
     if verb == 'examine':
         for item in player.location.items:
+            if item.name == lock:
+                code = input("Enter code ")
+                if code == '974354':
+                    print('Your code opened the gate! You are free!')
+                    quit()
+                else:
+                    print('Your code does not work')
+        for item in player.location.items:
             if item.name == noun:
                 print(item.description)
-        for item in player.inventory.items:
+        for item in player.inventory:
             if item.name == noun:
                 print(item.description)
 
@@ -140,21 +153,73 @@ while True:
             if item.name == noun:
                 if item.is_movable:
                     print(f"{item.name} is added to your inventory")
+                    player.location.items.remove(item)
+                    player.inventory.append(item)
                 else:
                     print("Sorry, you can't move that")
 
-    #climb
+    #climb - need editing
     if verb == 'climb':
         for item in player.location.items:
             if item.name == 'tree':
                 if apple in player.inventory:
                     print("A bird flew out of the tree and attacked you. You gave him your apple and ran away.")
-                    inventory = player.inventory.remove(apple)
+                    player.inventory.remove(apple)
                 else:
                     print("You tried climbing the tree. Unfortunatly you fell out and broke your ankle. Game over. ")
-                    exit()
+                    quit()
             if item.name == 'gate':
                 print("You tried climbing the gate, but you fell down and broke your ankle. Game over.")
-                exit()
+                quit()
             else:
                 print("You can not climb this")
+
+    #drop
+    if verb == 'drop':
+        for item in player.inventory:
+            if item.name == noun:
+                print(f"{item.name} has been removed from your inventory")
+                player.inventory.remove(item)
+                player.location.items.append(item)
+
+    #give
+    if verb == 'give':
+        for item in player.inventory:
+            if item.name == w_three:
+                for object in player.location.items:
+                    if object.name == noun:
+                        print(f"You gave {item.name} to {object.name}")
+                        player.inventory.remove(item)
+                        object.inventory.append(item)
+
+    #inventory
+    if verb == 'inventory':
+        print("You have the following: ")
+        for item in player.inventory:
+            print(item.name)
+
+    #move - check to see if works
+    if verb == 'exit':
+        if noun in player.location.exits:
+            player.location = player.location.exits[noun]
+            print(f"You go {noun} and enter the {player.location.name}.")
+        else:
+            print("You can not go that way")
+
+    #kitchen specific
+    if player.location == kitchen:
+        if verb == 'exit' and leaves not in chef.inventory and noun == 'east':
+            print("The chef caught you. He threw you back outside and locked the door. Game over")
+            quit()
+        if leaves in chef.inventory:
+            print('The green leaves you gave the chef turned out to be oregano. He is engrossed in adding it to his dinner.')
+
+    #living room specific
+    if player.location == living_room:
+        if verb == 'exit' and noun == 'north' and bones not in dog.inventory:
+            print("You woke up the dog. Suprised by your intrusion he bit you! Game over.")
+            quit()
+        if bones in dog.inventory:
+            print("The dog happily accepted your gift and is munching on the bones.")
+
+    #front yard specific
