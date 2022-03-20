@@ -96,7 +96,7 @@ else:
 
 #make  instructions
 instructions = ("""You can move in 4 directions: north, south, east, west
-You can interact: get, drop, examine, climb, give
+You can interact: get, drop, examine, climb, give 
 You can check your inventory: inv
 You can repeat instructions: instructions""")
 
@@ -137,6 +137,7 @@ while True:
     #quit Game
     if verb == 'quit':
         print('You quit the game')
+        print('')
         quit()
 
     #instructions
@@ -151,9 +152,11 @@ while True:
                 code = input("Enter code ")
                 if code == '974354':
                     print('Your code opened the gate! You are free!')
+                    print('')
                     quit()
                 else:
                     print('Your code does not work')
+                    print('')
         for item in player.location.items:
             if item.name == noun:
                 print(item.description)
@@ -168,37 +171,44 @@ while True:
                 if len(player.inventory) < 2:
                     if item.is_movable:
                         print(f"{item.name} is added to your inventory")
+                        print('')
                         player.location.items.remove(item)
                         player.inventory.append(item)
                     else:
                         print("Sorry, you can't move that")
+                        print("")
                 else:
                     print("You can only carry 2 items at a time.")
+                    print("")
 
-    #climb - need editing
+    #climb
     if verb == 'climb':
-        if noun == 'tree':
-            for item in player.location.items:
-                if item.name == noun:
-                    if apple in player.inventory:
-                        print("A bird flew out of the tree and attacked you. You gave him your apple and ran away.")
-                        player.inventory.remove(apple)
-                    else:
-                        print("You tried climbing the tree. Unfortunatly you fell out and broke your ankle. Game over. ")
-                        quit()
-        if noun == 'gate':
-            for item in player.location.items:
-                if item.name == noun:
-                    print("You tried climbing the gate, but you fell down and broke your ankle. Game over.")
-                    quit()
+        if item in player.location.items:
+            if item.name == 'tree':
+                if apple in player.inventory:
+                    print("A bird flew out of the tree and attacked you. You gave him your apple and ran away.")
+                    print("")
+                    player.inventory.remove(apple)
                 else:
-                    print("You can not climb this")
+                    print("You tried climbing the tree. Unfortunatly you fell out and broke your ankle. Game over. ")
+                    print('')
+                    quit()
+            if noun == 'gate':
+                for item in player.location.items:
+                    if item.name == noun:
+                        print("You tried climbing the gate, but you fell down and broke your ankle. Game over.")
+                        print("")
+                        quit()
+            else:
+                print("You can not climb this")
+                print("")
 
     #drop
     if verb == 'drop':
         for item in player.inventory:
             if item.name == noun:
                 print(f"{item.name} has been removed from your inventory")
+                print("")
                 player.inventory.remove(item)
                 player.location.items.append(item)
 
@@ -209,30 +219,36 @@ while True:
                 for object in player.location.items:
                     if object.name == noun:
                         print(f"You gave {item.name} to {object.name}")
+                        print("")
                         player.inventory.remove(item)
                         object.inventory.append(item)
-    
+
     #inventory
     if verb == 'inv':
         print("You have the following: ")
         for item in player.inventory:
             print(item.name)
+            print("")
 
     #kitchen specific
     if player.location == kitchen:
         if verb == 'exit' and leaves not in chef.inventory and noun == 'east':
             print("The chef caught you. He threw you back outside and locked the door. Game over")
+            print("")
             quit()
         if leaves in chef.inventory:
             print('The green leaves you gave the chef turned out to be oregano. He is engrossed in adding it to his dinner.')
+            print("")
 
     #living room specific
     if player.location == living_room:
         if verb == 'exit' and noun == 'north' and bones not in dog.inventory:
             print("You woke up the dog. Suprised by your intrusion he bit you! Game over.")
+            print("")
             quit()
         if bones in dog.inventory:
             print("The dog happily accepted your gift and is munching on the bones.")
+            print("")
 
     #front yard specific
 
@@ -241,5 +257,7 @@ while True:
         if noun in player.location.exits:
             player.location = player.location.exits[noun]
             print(f"You go {noun} and enter the {player.location.name}.")
+            print("")
         else:
             print("You can not go that way")
+            print("")
