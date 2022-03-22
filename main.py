@@ -96,7 +96,7 @@ else:
 
 #make  instructions
 instructions = ("""You can move in 4 directions: north, south, east, west
-You can interact: get, drop, examine, climb, give 
+You can interact: get, drop, examine, climb, give
 You can check your inventory: inv
 You can repeat instructions: instructions""")
 
@@ -127,6 +127,7 @@ while True:
     print("")
 
     words = command.split()
+    verb, noun, w_three = None, None, None  # Instantiate variables
     if len(words) > 0:
         verb = words[0]
     if len(words) >1:
