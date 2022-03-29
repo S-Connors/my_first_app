@@ -5,28 +5,19 @@ from rich.prompt import Prompt
 from rich.console import Console
 import re
 
+from models import Room, Player, Item
+import utils
+
+utils.hello()
+
+#can import things unconventually
+from utils.parse import hello
+hello()
+
+
 # Create your rich console
 con = Console()
 
-class Room():
-    def __init__(self, name, discription):
-        self.name = name
-        self.discription = discription
-        self.exits = {}
-        self.items = []
-
-class Player():
-    def __init__(self, name, location):
-        self.name = name
-        self.location = location
-        self.inventory = []
-
-class Item():
-    def __init__(self, name, description, is_movable):
-        self.name = name
-        self.description = description
-        self.is_movable = is_movable
-        self.inventory = []
 
 #create garden items
 sunflower = Item("sunflower", "Beautiful yellow sunflower in bloom", True)
